@@ -2,7 +2,7 @@ from Crypto.Cipher import AES,PKCS1_OAEP
 from Crypto.Random import get_random_bytes
 from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
-
+import ast
 import json
 #------------------------------------------------------Symmetric------------------------------------------------------#
 # Save key, tag, and nonce to a file
@@ -25,20 +25,27 @@ def symmetric_load_from_file(filename):
     nonce = bytes.fromhex(data["nonce"])
     return key, tag, nonce
 
-def symmetric_encryption(text, key=None, save_keys=True, filename="keys.json"):
-    if key is None:
-        key = get_random_bytes(16)
+def symmetric_encryption(text, save_keys=False, filename="keys.json"):
+    text_bytes = text.encode('utf-8')
     
+    key = get_random_bytes(16)
     cipher = AES.new(key, AES.MODE_GCM)
+
+    
     nonce = cipher.nonce
 
     # Encrypt and get both ciphertext and tag
-    ciphertext, tag = cipher.encrypt_and_digest(text)
+    ciphertext, tag = cipher.encrypt_and_digest(text_bytes)
     
     if save_keys:
-        symmetric_save_to_file(filename, key, tag, nonce)
-        
+        if ".json" in filename:
+            symmetric_save_to_file(filename, key, tag, nonce)
+        else:
+            symmetric_save_to_file(filename+".json", key, tag, nonce)
+            
     return (ciphertext, tag), key, nonce
+
+
 
 def symmetric_decryption(ciphertext, tag=None, key=None, nonce=None, load_keys=False, filename="keys.json"):
     if load_keys:
@@ -46,10 +53,13 @@ def symmetric_decryption(ciphertext, tag=None, key=None, nonce=None, load_keys=F
     else:
         if tag is None or key is None or nonce is None:
             raise ValueError("Tag, Key, and Nonce are required when load_keys is False")
-        
+    
+    # Convert the ciphertext string to actual bytes
+    ciphertext_bytes = ast.literal_eval(ciphertext)
+    
     # Decrypt and verify the tag
     cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
-    plaintext = cipher.decrypt_and_verify(ciphertext, tag)
+    plaintext = cipher.decrypt_and_verify(ciphertext_bytes, tag)
     
     return plaintext.decode()
 
@@ -66,6 +76,7 @@ def asymmetric_load_from_file(filename):
     return key
 
 def asymmetric_encryption(text, public_key=None, save_keys=True, filename="default.bin"):
+    text_bytes = text.encode('utf-8')
     if public_key is None:
         # Generate RSA keys
         keys = RSA.generate(2048)
@@ -93,11 +104,7 @@ def asymmetric_encryption(text, public_key=None, save_keys=True, filename="defau
     # Encrypt the message with the public key
     cipher = PKCS1_OAEP.new(public_key_obj)
     
-    # Ensure text is in bytes
-    if isinstance(text, str):
-        text = text.encode()
-    
-    ciphertext = cipher.encrypt(text)
+    ciphertext = cipher.encrypt(text_bytes)
     return ciphertext, public_key
     
 def asymmetric_decryption(ciphertext,private_key=None,load_private_key=None,filename="default"):
