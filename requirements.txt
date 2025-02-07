@@ -1,0 +1,4 @@
+click
+rich
+pyfiglet
+pycryptodome
