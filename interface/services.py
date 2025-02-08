@@ -49,10 +49,16 @@ def symmetric_encryption(text, save_keys=False, filename="keys.json"):
 
 def symmetric_decryption(ciphertext, tag=None, key=None, nonce=None, load_keys=False, filename="keys.json"):
     if load_keys:
+        if ".json" not in filename:
+            filename += ".json"
         key, tag, nonce = symmetric_load_from_file(filename)
     else:
         if tag is None or key is None or nonce is None:
             raise ValueError("Tag, Key, and Nonce are required when load_keys is False")
+        else:
+            key = bytes.fromhex(key)
+            tag = bytes.fromhex(tag)
+            nonce = bytes.fromhex(nonce)
     
     # Convert the ciphertext string to actual bytes
     ciphertext_bytes = ast.literal_eval(ciphertext)
@@ -75,7 +81,7 @@ def asymmetric_load_from_file(filename):
         key = f.read()
     return key
 
-def asymmetric_encryption(text, public_key=None, save_keys=True, filename="default.bin"):
+def asymmetric_encryption(text, public_key=None, save_keys=False, filename="default.bin"):
     text_bytes = text.encode('utf-8')
     if public_key is None:
         # Generate RSA keys
@@ -85,8 +91,12 @@ def asymmetric_encryption(text, public_key=None, save_keys=True, filename="defau
         private_key = keys.export_key()
 
         if save_keys:
-            name = filename.split('.')[0]
-            format = filename.split('.')[1]
+            try:
+                name = filename.split('.')[0]
+                format = filename.split('.')[1]
+            except:
+                raise FileNotFoundError
+            
             # Save public key
             asymmetric_save_to_file(f"{name}_public_key.{format}", public_key)
             # Save private key
@@ -107,9 +117,9 @@ def asymmetric_encryption(text, public_key=None, save_keys=True, filename="defau
     ciphertext = cipher.encrypt(text_bytes)
     return ciphertext, public_key
     
-def asymmetric_decryption(ciphertext,private_key=None,load_private_key=None,filename="default"):
+def asymmetric_decryption(ciphertext,private_key=None,load_private_key=False,filename="default"):
     if private_key is None:
-        if load_private_key is None:
+        if load_private_key:
             raise ValueError("Private Key is required")
         else:
             # Import RSA private key
@@ -145,6 +155,7 @@ def hash_encryption(text,salt=None,save_salt=True,load_salt=False,filename="defa
         else:
             salt = hashing_load_from_file(filename)
             
+    text = text.encode()
     # Combine data and salt
     text_with_salt = salt + text
 
