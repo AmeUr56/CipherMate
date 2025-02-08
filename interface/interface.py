@@ -146,6 +146,22 @@ def asymmetric_decrypt(ciphertext,load_private_key,filename):
     console.print(plaintext)
     console.print("[Output is Auto Copied]")
 
-    
+
+@ciphermate.command(help="hashing")
+@click.option("--load_salt",is_flag=True,help="whether to load salt from file or no.")
+@click.option("--save_salt",is_flag=True,help="whether to store salt to file or no.")
+@click.option("--filename",help="filename to save or load salt.")
+@click.argument("text")
+def hash(text,load_salt,save_salt,filename):
+    progress_bar(20)
+    if filename is not None:
+        hashtext,_ = hash_encryption(text,save_salt=save_salt,load_salt=load_salt,filename=filename)
+    else:
+        hashtext,_ = hash_encryption(text,save_salt=save_salt,load_salt=load_salt,filename=filename)
+
+    pyperclip.copy(hashtext)
+    console.print(hashtext)
+    console.print("[Output is Auto Copied]")
+
 if __name__ == "__main__":
     ciphermate()
