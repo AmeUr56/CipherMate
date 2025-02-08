@@ -2,3 +2,4 @@ click
 rich
 pyfiglet
 pycryptodome
+pyperclip

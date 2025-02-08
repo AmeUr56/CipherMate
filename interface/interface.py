@@ -3,8 +3,8 @@ import pyperclip
 from rich.console import Console
 from rich.layout import Layout
 
-from services import symmetric_encryption,symmetric_decryption,asymmetric_encryption,asymmetric_decryption,hash_encryption
-from scripts import ascii_banner,progress_bar
+from .services import symmetric_encryption,symmetric_decryption,asymmetric_encryption,asymmetric_decryption,hash_encryption
+from .scripts import ascii_banner,progress_bar
 
 # Initialize Rich Console
 console = Console()
@@ -25,30 +25,30 @@ def about():
     console.print("🔹 Key Management & Storage")
     
     console.print("\n[bold white]Usage:[/bold white]")
-    console.print("- Run [italic green]python interface.py about[/italic green] to see details about the interface.")
+    console.print("- Run [italic green]ciphermate about[/italic green] to see details about the interface.")
 
-    console.print("- Run [italic green]python interface.py symmetric-encrypt[/italic green] to encrypt text with symmetric method.")
+    console.print("- Run [italic green]ciphermate symmetric-encrypt[/italic green] to encrypt text with symmetric method.")
     console.print("  --save_keys    Whether to store the key, tag, nonce in file (default is yes).")
     console.print("  --filename     Filename of the stored keys.")
     console.print("  --key          Key to encrypt data with.")
     console.print("  text           The text to be encrypted.")
 
-    console.print("- Run [italic green]python interface.py symmetric-decrypt[/italic green] to decrypt encrypted text with symmetric method.")
+    console.print("- Run [italic green]ciphermate symmetric-decrypt[/italic green] to decrypt encrypted text with symmetric method.")
     console.print("  --load_keys    Whether to load saved keys (tag, key, nonce).")
     console.print("  --filename     Filename to store keys in.")
     console.print("  ciphertext     The encrypted text to be decrypted.")
 
-    console.print("- Run [italic green]python interface.py asymmetric-encrypt[/italic green] to encrypt text with asymmetric method.")
+    console.print("- Run [italic green]ciphermate asymmetric-encrypt[/italic green] to encrypt text with asymmetric method.")
     console.print("  --save_keys    Whether to store the public and private keys to a file.")
     console.print("  --filename     Filename to store keys in.")
     console.print("  text           The text to be encrypted.")
 
-    console.print("- Run [italic green]python interface.py asymmetric-decrypt[/italic green] to decrypt encrypted text with asymmetric method.")
+    console.print("- Run [italic green]ciphermate asymmetric-decrypt[/italic green] to decrypt encrypted text with asymmetric method.")
     console.print("  --load_private_key Whether to load the private key from a file.")
     console.print("  --filename        Filename of the stored private key.")
     console.print("  ciphertext        The encrypted text to be decrypted.")
 
-    console.print("- Run [italic green]python interface.py hash[/italic green] to hash text.")
+    console.print("- Run [italic green]ciphermate hash[/italic green] to hash text.")
     console.print("  --load_salt   Whether to load salt from file.")
     console.print("  --save_salt   Whether to store salt to file.")
     console.print("  --filename    Filename to save or load salt.")
@@ -163,5 +163,8 @@ def hash(text,load_salt,save_salt,filename):
     console.print(hashtext)
     console.print("[Output is Auto Copied]")
 
-if __name__ == "__main__":
+def main():
     ciphermate()
+    
+if __name__ == "__main__":
+    main()
